@@ -1,0 +1,16 @@
+import Joi from '@hapi/joi';
+
+const signupValidation = Joi.object({
+  email: Joi.string().required().email().lowercase(),
+  password: Joi.string().required().min(8)
+})
+
+const loginValidation = Joi.object({
+  email: Joi.string().required().email().lowercase(),
+  password: Joi.string().required().min(8)
+})
+
+export {
+  signupValidation, 
+  loginValidation, 
+};

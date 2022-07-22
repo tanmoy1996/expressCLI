@@ -1,0 +1,14 @@
+{
+  "name": "expresscli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "expressCLI.js",
+  "scripts": {
+    "start": "node ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "prompt-sync": "^4.2.0"
+  }
+}

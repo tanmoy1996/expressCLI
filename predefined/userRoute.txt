@@ -1,0 +1,52 @@
+import express from 'express';
+import createError from 'http-errors';
+
+import User from '../models/user.js';
+import { signupValidation, loginValidation } from '../helper/validation/user.js';
+
+const router = express.Router();
+
+router.post('/signup', async (req,res, next)=>{
+  try {
+    const sanitisedUser = await signupValidation.validateAsync(req.body);
+    const userExist = await User.findOne({email:sanitisedUser.email});
+    if(userExist){
+      throw createError.Conflict(`${sanitisedUser.email} is already registered`)
+    }
+    else{
+      const user = new User(sanitisedUser);
+      const savedUser = await user.save();
+      res.send({
+        email:savedUser.email,
+        id:savedUser.id });    
+    }
+  } catch (error) {
+    if(error.isJoi === true){
+      error.status = 422;
+    }
+    next(error);
+  }
+})
+
+router.post('/login', async (req,res, next)=>{
+  try {
+    const sanitisedUser = await loginValidation.validateAsync(req.body);
+    const user = await User.findOne({email: sanitisedUser.email})
+    
+    if(!user) throw createError.NotFound(`User not registered`)
+    const isMatch = await user.isValidPassword(sanitisedUser.password)
+    if(!isMatch) throw createError.Unauthorized('User not registered');
+
+    res.send({
+      email:user.email,
+      id:user.id});
+  }
+  catch (error) {
+    if(error.isJoi === true){
+      return next(createError.BadRequest('Invalid Username/Password'))
+    }
+    next(error);
+  }
+})
+
+export default router;
